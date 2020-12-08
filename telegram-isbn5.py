@@ -1,4 +1,4 @@
-# - *- coding: utf- 8 - *-
+#!/usr/bin/python3
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import requests
 import re
@@ -14,6 +14,9 @@ from tqdm import tqdm
 from pyzbar import pyzbar
 import argparse
 import cv2
+
+with open("/home/lowpaw/Downloads/telegram-koodeja.json") as json_file:
+    koodit = json.load(json_file)
 
 def info(bot, update):
     update.message.reply_text("Welcome, this bot is used to find Finnish book meta information in BibTeX-form.\n--\n"
@@ -181,8 +184,8 @@ def isbn2bibtex(isbn):
 
     
 def tuoreinTieto():
-    TOKEN = '5UZ5AmOLC27BpjSVmKgnc2ROwKfLMWwy4k2f69su' # lateus96
-    # TOKEN = '6ZCRtj6YVH4Ios5mLodOb2NJ0sLzPbC7oevg9QRh' lauri.a.jokinen
+    TOKEN = koodit["fingrid"] # lateus96
+    # TOKEN = koodit["fingrid2"] lauri.a.jokinen
     five_minutes = d.timedelta(minutes=80)
     now = datetime.now() + five_minutes
     before = datetime.now() - five_minutes
@@ -222,12 +225,12 @@ def isbn_picture(bot, update):
 def save_image(update):
     file_id = update['message']['photo'][-1]['file_id']
     picLink = 'https://api.telegram.org/bot'
-    picLink = picLink + '931913526:AAG0VvqL3Pz5XG-Q4Lpbx7_Dxg34MxyXWyQ'
+    picLink = picLink + koodit["isbn"]
     picLink = picLink + '/getFile?file_id='
     picLink = picLink + file_id
     file_path = requests.get(picLink).json()['result']['file_path']
     download_path = 'https://api.telegram.org/file/bot'
-    download_path = download_path + '931913526:AAG0VvqL3Pz5XG-Q4Lpbx7_Dxg34MxyXWyQ'
+    download_path = download_path + koodit["isbn"]
     download_path = download_path + '/' + file_path
     
     response = requests.get(download_path)
@@ -246,7 +249,7 @@ def read_barcode(path):
     
 def main():
   # Create Updater object and attach dispatcher to it
-  updater = Updater('931913526:AAG0VvqL3Pz5XG-Q4Lpbx7_Dxg34MxyXWyQ')
+  updater = Updater(koodit["isbn"])
   dispatcher = updater.dispatcher
   print("Bot started")
 
