@@ -18,7 +18,7 @@ import cv2
 with open("/home/lowpaw/Downloads/telegram-koodeja.json") as json_file:
     koodit = json.load(json_file)
 
-def info(bot, update):
+def info(update, context):
     update.message.reply_text("Welcome, this bot is used to find Finnish book meta information in BibTeX-form.\n--\n"
         "Tämä botti etsii ISBN-koodin avulla suomalaisen kirjan metatiedot BibTex-muodossa. "
         "Tiedot etsitään Finnan avoimen API:n kautta, joka on ehkä suurin suomalaisten kirjojen tietokanta. "
@@ -30,13 +30,13 @@ def info(bot, update):
         "Tuotantovaje/tuotantoylijäämä kuvaa Suomen sähkön tuotannon ja kulutuksen välistä tasapainoa tuonnit ja viennit huomioon ottaen. "
         "Suomen tuotantovaje/tuotantoylijäämä lasketaan Suomen ja muiden Pohjoismaiden välisen sähkön nettotuonnin/nettoviennin ja kuluvalle tunnille sovitun tuonti/vientiohjelman erotuksena. Tieto päivittyy 3 minuutin välein.")
     
-def feedback(bot, update):
+def feedback(update, context):
     feedback = update.message.text
     print(feedback)
     if feedback[9:] == "":
         update.message.reply_text('Kirjoita komennon jälkeen palautteesi')
     else:
-        file = open('/home/lowpaw/Nextcloud/Telegram-botit/isbn-to-bibtex/isbn-palaute.txt', 'a')
+        file = open('/home/lowpaw/Downloads/telegram-bibtexbot/isbn-palaute.txt', 'a')
         file.write("\n"+feedback[9:])
         update.message.reply_text('Kiitos palautteesta!')
         file.close()
@@ -155,7 +155,7 @@ def formatField(jsonField):
     return field
 
 
-def find_isbn(bot, update):
+def find_isbn(update, context):
     isbn = update.message.text
     update.message.reply_text(isbn2bibtex(isbn))
     
@@ -194,7 +194,7 @@ def tuoreinTieto():
     url2 = 'https://api.fingrid.fi/v1/variable/198/events/json?start_time=' + start + '&end_time=' + end
     return requests.get(url2, headers={'x-api-key': TOKEN, 'Accept': 'application/json'}).json()[-1]['value']
 
-def spike(bot, update):
+def spike(update, context):
     value = tuoreinTieto()
     if value < -100:
         update.message.reply_text('Verkossa on paljon alituotantoa (' + str(-value).replace('.',',') + ' MW). Kannattaa odottaa vartti ennen kuin laitat uunin päälle.')
@@ -207,7 +207,7 @@ def spike(bot, update):
     elif value == 0:
         update.message.reply_text('Tuotanto on täydellisessä tasapainossa! (' + str(value).replace('.',',') + ' MW)')
 
-def isbn_picture(bot, update):
+def isbn_picture(update, context):
     update.message.reply_text("Ladataan kuvaa...")
     filepath = save_image(update)
     barcodes = read_barcode(filepath)
@@ -251,7 +251,7 @@ def main():
   # Create Updater object and attach dispatcher to it
   updater = Updater(koodit["isbn"])
   dispatcher = updater.dispatcher
-  print("Bot started")
+  print("Bibtexbot started")
 
   # Add command handler to dispatcher
   info_handler = CommandHandler('info',info)
