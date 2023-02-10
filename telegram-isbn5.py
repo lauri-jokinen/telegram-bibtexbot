@@ -14,6 +14,9 @@ from tqdm import tqdm
 from pyzbar import pyzbar
 import argparse
 import cv2
+from os.path import exists
+import os
+import random
 
 with open("/home/lowpaw/Downloads/telegram-koodeja.json") as json_file:
     koodit = json.load(json_file)
@@ -247,6 +250,94 @@ def read_barcode(path):
     barcodes = pyzbar.decode(image)
     return barcodes
     
+# create new
+# modify a random one
+# modify an existing one
+# list all
+# pull one
+
+def separate_first_word(s):
+    # removes first word and spaces after it
+    spaces = [' ', '\n', '\t']
+    p = 0
+    no_mark_in_input = True
+    for space_mark in spaces:
+        if space_mark in s:
+            no_mark_in_input = False
+            break
+    if no_mark_in_input: return ('','')
+    while not (s[p] in spaces): p=p+1
+    first_word = s[:p]
+    while (s[p] in spaces): p=p+1
+    return (first_word, s[p:])
+
+def authorized(update, context):
+  return update.message.from_user.id in koodit["lowpaw_teleID"]
+
+def notes_save(update, context):
+  if not authorized(update, context):
+    update.message.reply_text("You are not authorized.")
+    return
+  text = update.message.text
+  (command, text) = separate_first_word(text)
+  (note_name, text) = separate_first_word(text)
+  if note_name == '':
+    update.message.reply_text("Komento väärin :(")
+    return
+  file_name = '/home/lowpaw/Downloads/telegram-bibtexbot/notes/{}.txt'.format(note_name)
+  if exists(file_name):
+    fo = open(file_name, 'r')
+    old_text = fo.read()
+    fo.close()
+    update.message.reply_text("/save {}\n{}".format(note_name, old_text))
+  if not text == '':
+    fo = open(file_name, 'w')
+    fo.write(text)
+    fo.close()
+    update.message.reply_text("Tallennettu!")
+  
+def notes_list(update, context):
+  if not authorized(update, context):
+    update.message.reply_text("You are not authorized.")
+    return
+  path = '/home/lowpaw/Downloads/telegram-bibtexbot/notes'
+  dir_list = os.listdir(path)
+  dir_list.sort()
+  update.message.reply_text('\n'.join(dir_list))
+  
+def notes_random(update, context):
+  if not authorized(update, context):
+    update.message.reply_text("You are not authorized.")
+    return
+  path = '/home/lowpaw/Downloads/telegram-bibtexbot/notes'
+  dir_list = os.listdir(path)
+  #print(dir_list)
+  file_name = random.choice(dir_list)
+  note_name = file_name[:-4] # removes .txt
+  file_name = path + '/' + file_name
+  fo = open(file_name, 'r')
+  old_text = fo.read()
+  fo.close()
+  update.message.reply_text("/save {}\n{}".format(note_name, old_text))
+  
+def notes_remove(update, context):
+  if not authorized(update, context):
+    update.message.reply_text("You are not authorized.")
+    return
+  text = update.message.text
+  (command, text) = separate_first_word(text)
+  (note_name, text) = separate_first_word(text + ' k')
+  file_name = '/home/lowpaw/Downloads/telegram-bibtexbot/notes/{}.txt'.format(note_name)
+  if exists(file_name):
+    fo = open(file_name, 'r')
+    old_text = fo.read()
+    fo.close()
+    update.message.reply_text("/save {}\n{}".format(note_name, old_text))
+    os.remove(file_name)
+    update.message.reply_text("Tehty!")
+  else:
+    update.message.reply_text("Muistiinpanoa ei ole :(")
+    
 def main():
   # Create Updater object and attach dispatcher to it
   updater = Updater(koodit["isbn"])
@@ -257,13 +348,25 @@ def main():
   info_handler = CommandHandler('info',info)
   feedback_handler = CommandHandler('palaute',feedback)
   spike_handler = CommandHandler('piikki',spike)
+  notes_save_handler = CommandHandler('save', notes_save)
+  notes_list_handler = CommandHandler('list', notes_list)
+  notes_random_handler = CommandHandler('random', notes_random)
+  notes_remove_handler = CommandHandler('remove', notes_remove)
+  
   isbn_handler    = MessageHandler(Filters.text, find_isbn)
   picture_handler = MessageHandler(Filters.photo, isbn_picture)
+  
+  
   dispatcher.add_handler(info_handler)
   dispatcher.add_handler(feedback_handler)
   dispatcher.add_handler(spike_handler)
+  dispatcher.add_handler(notes_save_handler)
+  dispatcher.add_handler(notes_list_handler)
+  dispatcher.add_handler(notes_random_handler)
+  dispatcher.add_handler(notes_remove_handler)
   dispatcher.add_handler(isbn_handler)
   dispatcher.add_handler(picture_handler)
+  
 
   # Start the bot
   updater.start_polling()
