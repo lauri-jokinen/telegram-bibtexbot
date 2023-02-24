@@ -265,7 +265,7 @@ def separate_first_word(s):
         if space_mark in s:
             no_mark_in_input = False
             break
-    if no_mark_in_input: return ('','')
+    if no_mark_in_input: return (s,'')
     while not (s[p] in spaces): p=p+1
     first_word = s[:p]
     while (s[p] in spaces): p=p+1
