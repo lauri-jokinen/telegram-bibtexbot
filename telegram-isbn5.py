@@ -311,13 +311,27 @@ def notes_random(update, context):
     return
   path = '/home/lowpaw/Downloads/telegram-bibtexbot/notes'
   dir_list = os.listdir(path)
-  #print(dir_list)
-  file_name = random.choice(dir_list)
-  note_name = file_name[:-4] # removes .txt
-  file_name = path + '/' + file_name
+  
+  #current_oldest_filename = random.choice(dir_list)
+  #current_oldest_filename = path + '/' + current_oldest_filename
+  #current_oldest_time = os.path.getmtime(current_oldest_filename)
+  current_oldest_filename = ''
+  current_oldest_time = float('inf')
+  
+  for p in range(10):
+    file_name = random.choice(dir_list)
+    file_name = path + '/' + file_name
+    time = os.path.getmtime(file_name)
+    
+    if time < current_oldest_time and file_name[-6:] != '_V.txt':
+      current_oldest_filename = file_name
+      current_oldest_time = time
+  file_name = current_oldest_filename
   fo = open(file_name, 'r')
   old_text = fo.read()
   fo.close()
+  note_name = file_name.split('/')[-1]
+  note_name = note_name[:-4] # removes .txt
   update.message.reply_text("/save {}\n{}".format(note_name, old_text))
   
 def notes_remove(update, context):
