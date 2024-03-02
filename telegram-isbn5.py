@@ -318,12 +318,12 @@ def notes_random(update, context):
   current_oldest_filename = ''
   current_oldest_time = float('inf')
   
-  for p in range(2):
+  for p in range(10):
     file_name = random.choice(dir_list)
     file_name = path + '/' + file_name
     time = os.path.getmtime(file_name)
     
-    if time < current_oldest_time: #and file_name[-6:] != '_V.txt':
+    if time < current_oldest_time: #and file_name[-6:] != '_V.txt
       current_oldest_filename = file_name
       current_oldest_time = time
   file_name = current_oldest_filename
@@ -377,7 +377,6 @@ def main():
 
   isbn_handler    = MessageHandler(Filters.text, find_isbn)
   picture_handler = MessageHandler(Filters.photo, isbn_picture)
-  
   
   dispatcher.add_handler(info_handler)
   dispatcher.add_handler(feedback_handler)
