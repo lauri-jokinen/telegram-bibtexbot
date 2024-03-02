@@ -1,0 +1,60 @@
+\documentclass[a5paper,12pt]{article}
+\usepackage[finnish]{babel}
+\usepackage[utf8]{inputenc}
+%\usepackage[footnotes,definitionLists,hashEnumerators,smartEllipses,hybrid]{markdown}
+\usepackage[document]{ragged2e}
+
+\makeatletter % use absolute directory as a base for \input
+\def\input@path{{/home/lowpaw/Downloads/telegram-bibtexbot/}}
+\makeatother
+
+% Pandoc produces this commend
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\usepackage{tgheros}
+\renewcommand*\familydefault{\sfdefault} %% Only if the base font of the document is to be sans serif
+\usepackage[T1]{fontenc}
+
+%\usepackage[default]{sourcesanspro}
+%\usepackage[T1]{fontenc}
+\renewcommand{\baselinestretch}{0.98} % riviväli
+\usepackage[margin=0.3in]{geometry}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.4em}
+
+%\makeatletter % removes section numbering
+%\renewcommand{\@seccntformat}[1]{}
+%\makeatother
+\usepackage{hyperref,url}
+\hypersetup{colorlinks=true,linkcolor=blue, linktocpage}
+
+\title{Fii Fighters}
+\author{lateus96 }
+\date{July 2021}
+
+%\newcommand{\biisi}[1]{
+%\markdownInput{biisit/#1} \newpage
+%}
+
+%\newcommand{\biisipdf}[2]{
+%  \invisiblesubsection{#1}
+%  \includepdf[width=0.98\textwidth,pages={1-},pagecommand={}]{#2}
+%} % otsikko & biisi
+
+%\usepackage{xcolor}
+%\usepackage{pagecolor}
+%\pagecolor{black}
+%\color{white}
+
+\begin{document}
+%\LARGE
+\sloppy
+
+\section{Notes, Lauri Jokinen, \today}
+
+\tableofcontents
+
+\input{notes.tex}
+
+\end{document}

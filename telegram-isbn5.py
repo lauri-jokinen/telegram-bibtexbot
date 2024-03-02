@@ -318,12 +318,12 @@ def notes_random(update, context):
   current_oldest_filename = ''
   current_oldest_time = float('inf')
   
-  for p in range(10):
+  for p in range(2):
     file_name = random.choice(dir_list)
     file_name = path + '/' + file_name
     time = os.path.getmtime(file_name)
     
-    if time < current_oldest_time and file_name[-6:] != '_V.txt':
+    if time < current_oldest_time: #and file_name[-6:] != '_V.txt':
       current_oldest_filename = file_name
       current_oldest_time = time
   file_name = current_oldest_filename
@@ -351,7 +351,14 @@ def notes_remove(update, context):
     update.message.reply_text("Tehty!")
   else:
     update.message.reply_text("Muistiinpanoa ei ole :(")
-    
+
+def notes_gen(update, context):
+  if not authorized(update, context):
+    update.message.reply_text("You are not authorized.")
+    return
+  exec(open("/home/lowpaw/Downloads/telegram-bibtexbot/gen.py").read())
+  update.message.reply_text('Tehty!')
+
 def main():
   # Create Updater object and attach dispatcher to it
   updater = Updater(koodit["isbn"])
@@ -366,7 +373,8 @@ def main():
   notes_list_handler = CommandHandler('list', notes_list)
   notes_random_handler = CommandHandler('random', notes_random)
   notes_remove_handler = CommandHandler('remove', notes_remove)
-  
+  notes_gen_handler = CommandHandler('gen', notes_gen)
+
   isbn_handler    = MessageHandler(Filters.text, find_isbn)
   picture_handler = MessageHandler(Filters.photo, isbn_picture)
   
@@ -378,6 +386,7 @@ def main():
   dispatcher.add_handler(notes_list_handler)
   dispatcher.add_handler(notes_random_handler)
   dispatcher.add_handler(notes_remove_handler)
+  dispatcher.add_handler(notes_gen_handler)
   dispatcher.add_handler(isbn_handler)
   dispatcher.add_handler(picture_handler)
   
